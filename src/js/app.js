@@ -3,7 +3,7 @@ $(function() {
    * Includes functionality to setup the Google Map, use geolocation, and stores
    * map options.
    */
-  var MapManager = {
+  var MyMap = {
   	latLng: null,
   	mapOptions: {},
   	myMap: null,
@@ -29,7 +29,7 @@ $(function() {
   										}
   									};
 
-  		myMap = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
+  		this.map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
   	},
 
   	findUserLocation: function() {
@@ -42,11 +42,11 @@ $(function() {
   				var pos = new google.maps.LatLng(position.coords.latitude,
   																				position.coords.longitude);
   				var infowindow = new google.maps.InfoWindow({
-  					map: myMap,
+  					map: map,
   					position: pos,
   					content: 'Location found!'
   				});
-  				myMap.setCenter(pos);
+  				map.setCenter(pos);
   			}, function() {
   				handleNoGeolocation(true);
   			});
@@ -63,7 +63,7 @@ $(function() {
   				content = 'Error: Your browser doesn\'t support geolocation :(';
   			}
   			var options = {
-  				map: myMap,
+  				map: map,
   				position: latLng,
   				content: content
   			};
@@ -77,6 +77,6 @@ $(function() {
 		var self = this;
 	};
 
-  MapManager.init();
+  MyMap.init();
   ko.applyBindings(new ViewModel());
 });

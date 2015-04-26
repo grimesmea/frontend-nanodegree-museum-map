@@ -11,17 +11,17 @@ $(function() {
   	init: function() {
   		if(typeof google === 'object' && typeof google.maps === 'object') {
         this.createMap();
-  			this.findUserLocation();
+  			//this.findUserLocation();
   		} else {
   			$('#map-canvas').append('Oops...something went wrong. Try back later!');
   		}
   	},
 
   	createMap: function() {
-  		latLng = new google.maps.LatLng(53,	6);
+  		latLng = new google.maps.LatLng(53.2734, -7.778320310000026);
   		mapOptions = {
   									  center: latLng,
-  										zoom: 15,
+  										zoom: 8,
   										mapTypeId: google.maps.MapTypeId.ROADMAP,
   										zoomControl: true,
   										zoomControlOptions: {

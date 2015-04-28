@@ -9,19 +9,21 @@ $(function() {
   	myMap: null,
 
   	init: function() {
-  		if(typeof google === 'object' && typeof google.maps === 'object') {
+      if(typeof google === 'object' && typeof google.maps === 'object') {
         this.createMap();
   			//this.findUserLocation();
   		} else {
   			$('#map-canvas').append('Oops...something went wrong. Try back later!');
   		}
+
+
   	},
 
   	createMap: function() {
-  		latLng = new google.maps.LatLng(53.2734, -7.778320310000026);
-  		mapOptions = {
-  			center: latLng,
-  			zoom: 8,
+  		this.latLng = new google.maps.LatLng(53.348, -6.2597);
+  		this.mapOptions = {
+  			center: this.latLng,
+  			zoom: 16,
   			mapTypeId: google.maps.MapTypeId.ROADMAP,
   			zoomControl: true,
   			zoomControlOptions: {
@@ -29,7 +31,11 @@ $(function() {
   		  }
   		};
 
-  		this.map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
+  		this.map = new google.maps.Map(document.getElementById("map-canvas"), this.mapOptions);
+
+      google.maps.event.addListener(MyMap.map, 'idle', function() {
+          Places.init();
+      });
   	},
 
   	findUserLocation: function() {
@@ -71,6 +77,57 @@ $(function() {
   			map.setCenter(options.position);
   		};
   	}
+  };
+
+  /**
+   * Gets and stores places using Google Places API based on the map's current
+   * bounds.
+   */
+  var Places = {
+    myPlaces: [],
+    placeIds: new Set(),
+
+    init: function() {
+      this.getPlaces();
+    },
+
+    getPlaces: function() {
+      var services;
+      var mapBounds = MyMap.map.getBounds();
+
+      var request = {
+        location: MyMap.latLng,
+        bounds: mapBounds,
+        rankBy: google.maps.places.RankBy.PROMINENCE,
+        types: ['museum']
+      };
+
+      service = new google.maps.places.PlacesService(MyMap.map);
+      service.nearbySearch(request, this.callback);
+    },
+
+    callback: function(results, status) {
+      if(status == google.maps.places.PlacesServiceStatus.OK) {
+        for(var i = 0; i < results.length; i++) {
+          var myPlace = results[i];
+
+          if(!Places.placeIds.has(myPlace.place_id)) {
+            Places.placeIds.add(myPlace.place_id);
+            Places.myPlaces.push(myPlace);
+            Places.createMapMarker(myPlace);
+            console.log(myPlace.name);
+          }
+        }
+      }
+    },
+
+    createMapMarker: function(place) {
+      var marker = new google.maps.Marker({
+        position: place.geometry.location,
+        map: MyMap.map,
+        title: place.name
+      });
+    }
   };
 
 	var ViewModel = function() {

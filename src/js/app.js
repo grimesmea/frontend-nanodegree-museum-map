@@ -129,6 +129,7 @@ var Place = function(data) {
   this.latLng = ko.observable(data.geometry.location);
 	this.infowindowContent =  null;
 	this.infowindow = null;
+	this.hasWikiResponse = false;
 
 	this.marker = new google.maps.Marker({
 									position: data.geometry.location,
@@ -137,7 +138,7 @@ var Place = function(data) {
 								});
 
 	google.maps.event.addListener(self.marker, 'click', function() {
-		if(self.infowindow === null) {
+		if(self.hasWikiResponse === false) {
 			getWikiArticle();
 		}
 
@@ -149,14 +150,15 @@ var Place = function(data) {
     infowindowContent = '<h3>' + data.name + '</h3>';
 
 		var wikiRequestTimeout = setTimeout(function() {
-      self.infowindowContent = 'Failed to Get Wikipedia Resources';
-    }, 5000);
+      self.infowindowContent = infowindowContent +
+			                         '<p>Failed to reach Wikipedia</p>';
+			self.infowindow.setContent(self.infowindowContent);
+    }, 1000);
 
 		$.ajax({
       url: wikiUrl,
       dataType: 'jsonp',
       success: function(response) {
-        console.log("ajax returned success");
         var entry = response;
 
 				if(entry[2][0] != null) {
@@ -171,6 +173,7 @@ var Place = function(data) {
 				}
 
 				self.infowindow.setContent(self.infowindowContent);
+				self.hasWikiResponse === true;
 				clearTimeout(wikiRequestTimeout);
       }
     });
@@ -180,9 +183,6 @@ var Place = function(data) {
 	                    });
 	};
 };
-
-
-
 
 var ViewModel = function() {
 	var self = this;

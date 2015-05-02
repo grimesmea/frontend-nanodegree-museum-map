@@ -127,7 +127,15 @@ var Place = function(data) {
 
 	this.name = ko.observable(data.name);
   this.latLng = ko.observable(data.geometry.location);
+
+	this.marker = new google.maps.Marker({
+									position: data.geometry.location,
+									map: MyMap.map,
+									title: data.name
+								});
 };
+
+
 
 
 var ViewModel = function() {

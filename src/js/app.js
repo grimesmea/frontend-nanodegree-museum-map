@@ -23,7 +23,7 @@ var MyMap = {
 		this.latLng = new google.maps.LatLng(53.348, -6.2597);
 		this.mapOptions = {
 			center: this.latLng,
-			zoom: 15,
+			zoom: 12,
 			mapTypeId: google.maps.MapTypeId.ROADMAP,
 			zoomControl: true,
 			zoomControlOptions: {
@@ -127,12 +127,58 @@ var Place = function(data) {
 
 	this.name = ko.observable(data.name);
   this.latLng = ko.observable(data.geometry.location);
+	this.infowindowContent =  null;
+	this.infowindow = null;
 
 	this.marker = new google.maps.Marker({
 									position: data.geometry.location,
 									map: MyMap.map,
 									title: data.name
 								});
+
+	google.maps.event.addListener(self.marker, 'click', function() {
+		if(self.infowindow === null) {
+			getWikiArticle();
+		}
+
+		self.infowindow.open(MyMap.map, self.marker);
+	});
+
+	var getWikiArticle = function() {
+    var wikiUrl = 'http://en.wikipedia.org/w/api.php?action=opensearch&search=' + data.name + '&format=json&callback=wikiCallback';
+    infowindowContent = '<h3>' + data.name + '</h3>';
+
+		var wikiRequestTimeout = setTimeout(function() {
+      self.infowindowContent = 'Failed to Get Wikipedia Resources';
+    }, 5000);
+
+		$.ajax({
+      url: wikiUrl,
+      dataType: 'jsonp',
+      success: function(response) {
+        console.log("ajax returned success");
+        var entry = response;
+
+				if(entry[2][0] != null) {
+				  self.infowindowContent = infowindowContent +
+																	'<p>' + entry[2][0] + '</p>' +
+				  												'<a href="' + entry[3][0] + '" target="_blank">Read the full Wikipedia article</a>';
+				} else {
+					self.infowindowContent = infowindowContent +
+					                         '<p>No wikipedia article found for this location. ' +
+																	 'Please consider requesting an article be created. </p>' +
+																	 '<a href="http://en.wikipedia.org/wiki/Wikipedia:Requested_articles" target="_blank">See the Wikipedia requested article documentation</a>';
+				}
+
+				self.infowindow.setContent(self.infowindowContent);
+				clearTimeout(wikiRequestTimeout);
+      }
+    });
+
+    self.infowindow = new google.maps.InfoWindow({
+		                    content: self.infowindowContent
+	                    });
+	};
 };
 
 

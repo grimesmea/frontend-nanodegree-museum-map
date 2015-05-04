@@ -147,11 +147,15 @@ var Place = function(data) {
 
 	var getWikiArticle = function() {
     var wikiUrl = 'http://en.wikipedia.org/w/api.php?action=opensearch&search=' + data.name + '&format=json&callback=wikiCallback';
-    infowindowContent = '<h3>' + data.name + '</h3>';
+    var infowindowStartTags = '<div class="infowindow">';
+		var infowindowEndTags = '<div>';
+		infowindowContent = '<h3>' + data.name + '</h3>';
 
 		var wikiRequestTimeout = setTimeout(function() {
-      self.infowindowContent = infowindowContent +
-			                         '<p>Failed to reach Wikipedia</p>';
+      self.infowindowContent = infowindowStartTags +
+			                         infowindowContent +
+			                         '<p>Failed to reach Wikipedia</p>' +
+															 infowindowEndTags;
 			self.infowindow.setContent(self.infowindowContent);
     }, 1000);
 
@@ -162,14 +166,18 @@ var Place = function(data) {
         var entry = response;
 
 				if(entry[2][0] != null) {
-				  self.infowindowContent = infowindowContent +
-																	'<p>' + entry[2][0] + '</p>' +
-				  												'<a href="' + entry[3][0] + '" target="_blank">Read the full Wikipedia article</a>';
+				  self.infowindowContent = infowindowStartTags +
+					                         infowindowContent +
+																	 '<p>' + entry[2][0] + '</p>' +
+				  												 '<a href="' + entry[3][0] + '" target="_blank">Read the full Wikipedia article</a>' +
+																	 infowindowEndTags;
 				} else {
-					self.infowindowContent = infowindowContent +
+					self.infowindowContent = infowindowStartTags +
+					                         infowindowContent +
 					                         '<p>No wikipedia article found for this location. ' +
 																	 'Please consider requesting an article be created. </p>' +
-																	 '<a href="http://en.wikipedia.org/wiki/Wikipedia:Requested_articles" target="_blank">See the Wikipedia requested article documentation</a>';
+																	 '<a href="http://en.wikipedia.org/wiki/Wikipedia:Requested_articles" target="_blank">See the Wikipedia requested article documentation</a>' +
+																	 infowindowEndTags;
 				}
 
 				self.infowindow.setContent(self.infowindowContent);
@@ -187,11 +195,12 @@ var Place = function(data) {
 var ViewModel = function() {
 	var self = this;
 
-  this.places = ko.observableArray([]);
-  this.currentPlace = ko.observable();
-	this.query = ko.observable('');
+  self.places = ko.observableArray([]);
+  self.currentPlace = ko.observable();
+	self.query = ko.observable('');
+	self.listViewVisible= ko.observable(false);
 
-	this.search = function(value) {
+	self.search = function(value) {
 		self.places.removeAll();
 
 		for(var i = 0 ; i < Places.myPlaces.length; i++) {
@@ -202,6 +211,10 @@ var ViewModel = function() {
 	};
 
 	self.query.subscribe(self.search);
+
+	self.toggleListViewVisibility = function() {
+		self.listViewVisible(!self.listViewVisible());
+	};
 
   MyMap.init(self.places);
 };

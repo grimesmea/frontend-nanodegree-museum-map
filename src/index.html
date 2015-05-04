@@ -13,12 +13,14 @@
       <input data-bind="value: query, valueUpdate: 'keyup'" autocomplete="off" id="search-area" type="search" placeholder="Search...">
     </div>
 
-    <div data-bind="template: {name:'places-template', foreach: places}" id="search-results">
-
+    <div data-bind="click: toggleListViewVisibility" id="list-control">
+      <img id="nav-arrow" src="images/nav-arrow.png">
     </div>
 
+    <div data-bind="template: {name:'places-template', foreach: places}, visible: listViewVisible" id="search-results"></div>
+
     <script type="text/html" id="places-template">
-      <div data-bind="text: name" id="place-item"></div>
+      <div data-bind="text: name" class=" place-item"></div>
     </script>
 
     <link href='http://fonts.googleapis.com/css?family=Lato' rel='stylesheet' type='text/css'>

@@ -2,15 +2,26 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, intitial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Neighborhood Map</title>
     <link rel="stylesheet" href="css/style.css">
   </head>
   <body>
     <div id="map-canvas"></div>
-    <div id="search-box"></div>
-    <div id="places-list"></div>
 
+    <div id="search-bar">
+      <input data-bind="value: query, valueUpdate: 'keyup'" autocomplete="off" id="search-area" type="search" placeholder="Search...">
+    </div>
+
+    <div data-bind="template: {name:'places-template', foreach: places}" id="search-results">
+
+    </div>
+
+    <script type="text/html" id="places-template">
+      <div data-bind="text: name" id="place-item"></div>
+    </script>
+
+    <link href='http://fonts.googleapis.com/css?family=Lato' rel='stylesheet' type='text/css'>
     <script src="https://maps.googleapis.com/maps/api/js?&signed_in=true&libraries=places"></script>
     <script src="components/jquery/dist/jquery.js"></script>
     <script src="components/knockout/dist/knockout.js"></script>

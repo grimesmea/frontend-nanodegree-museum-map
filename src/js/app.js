@@ -112,10 +112,10 @@ var Places = {
 
         if(!Places.placeIds.has(myPlace.place_id)) {
           Places.placeIds.add(myPlace.place_id);
-          Places.myPlaces.push(myPlace);
-          console.log(myPlace.name);
+          Places.myPlaces.push(new Place(myPlace));
+					MyMap.observablePlacesArray.push(Places.myPlaces[Places.myPlaces.length-1]);
 
-					MyMap.observablePlacesArray.push(new Place(myPlace));
+					console.log(myPlace.name);
         }
       }
     }
@@ -189,6 +189,19 @@ var ViewModel = function() {
 
   this.places = ko.observableArray([]);
   this.currentPlace = ko.observable();
+	this.query = ko.observable('');
+
+	this.search = function(value) {
+		self.places.removeAll();
+
+		for(var i = 0 ; i < Places.myPlaces.length; i++) {
+      if(Places.myPlaces[i].name().toLowerCase().indexOf(value.toLowerCase()) >= 0) {
+        self.places.push(Places.myPlaces[i]);
+      }
+    }
+	};
+
+	self.query.subscribe(self.search);
 
   MyMap.init(self.places);
 };

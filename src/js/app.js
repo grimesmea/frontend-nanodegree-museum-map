@@ -24,16 +24,20 @@ var MyMap = {
 		this.mapOptions = {
 			center: this.latLng,
 			zoom: 12,
-			mapTypeId: google.maps.MapTypeId.ROADMAP,
-			zoomControl: true,
-			zoomControlOptions: {
-		    style: google.maps.ZoomControlStyle.DEFAULT
-		  }
+			mapTypeId: google.maps.MapTypeId.ROADMAP
 		};
 
     this.map = new google.maps.Map(document.getElementById("map-canvas"), this.mapOptions);
-    google.maps.event.addListener(MyMap.map, 'idle', function() {
-        Places.getPlaces();
+
+		google.maps.event.addListener(MyMap.map, 'idle', function() {
+			Places.getPlaces();
+    });
+
+		google.maps.event.addDomListener(window, 'resize', function() {
+			var center = MyMap.map.getCenter();
+
+			google.maps.event.trigger(MyMap.map, "resize");
+      MyMap.map.setCenter(center);
     });
 	},
 

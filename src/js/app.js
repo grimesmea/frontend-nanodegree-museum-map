@@ -24,7 +24,8 @@ var MyMap = {
 		this.mapOptions = {
 			center: this.latLng,
 			zoom: 12,
-			mapTypeId: google.maps.MapTypeId.ROADMAP
+			mapTypeId: google.maps.MapTypeId.ROADMAP,
+			disableDefaultUI: true
 		};
 
     this.map = new google.maps.Map(document.getElementById("map-canvas"), this.mapOptions);
@@ -143,13 +144,14 @@ var Place = function(data) {
 
 	google.maps.event.addListener(self.marker, 'click', function() {
 		if(self.hasWikiResponse === false) {
-			getWikiArticle();
+			self.getWikiArticle();
 		}
 
+    MyMap.map.setCenter(self.marker.position);
 		self.infowindow.open(MyMap.map, self.marker);
 	});
 
-	var getWikiArticle = function() {
+	this.getWikiArticle = function() {
     var wikiUrl = 'http://en.wikipedia.org/w/api.php?action=opensearch&search=' + data.name + '&format=json&callback=wikiCallback';
     var infowindowStartTags = '<div class="infowindow">';
 		var infowindowEndTags = '<div>';
@@ -215,6 +217,16 @@ var ViewModel = function() {
 	};
 
 	self.query.subscribe(self.search);
+
+	self.selectCurrentPlace = function(place) {
+		console.log(place.name);
+		if(place.hasWikiResponse === false) {
+			place.getWikiArticle();
+		}
+
+    MyMap.map.setCenter(place.marker.position);
+		place.infowindow.open(MyMap.map, place.marker);
+	};
 
 	self.toggleListViewVisibility = function() {
 		self.listViewVisible(!self.listViewVisible());

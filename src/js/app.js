@@ -145,14 +145,22 @@ var Place = function(data) {
 								});
 
 	google.maps.event.addListener(self.marker, 'click', function() {
+		self.openInfowindow();
+	});
+
+	this.openInfowindow = function() {
 		if(self.hasWikiResponse === false) {
 			self.getWikiArticle();
 		}
 
-    MyMap.map.setCenter(self.marker.position);
+		MyMap.map.setCenter(self.marker.position);
 		MyMap.map.panBy(0, -150);
+
+		self.marker.setAnimation(google.maps.Animation.BOUNCE);
+		setTimeout(function(){self.marker.setAnimation(null); }, 1350);
+
 		self.infowindow.open(MyMap.map, self.marker);
-	});
+	};
 
 	this.getWikiArticle = function() {
     var wikiUrl = 'http://en.wikipedia.org/w/api.php?action=opensearch&search=' + data.name + '&format=json&callback=wikiCallback';
@@ -241,14 +249,7 @@ var ViewModel = function() {
 	self.query.subscribe(self.search);
 
 	self.selectCurrentPlace = function(place) {
-		if(place.hasWikiResponse === false) {
-			place.getWikiArticle();
-		}
-
-    MyMap.map.setCenter(place.marker.position);
-		MyMap.map.panBy(0, -150);
-
-		place.infowindow.open(MyMap.map, place.marker);
+		place.openInfowindow();
 
 		if(!window.matchMedia("(min-width: 1200px)").matches) {
 			self.toggleListViewVisibility();

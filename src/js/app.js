@@ -148,6 +148,7 @@ var Place = function(data) {
 		}
 
     MyMap.map.setCenter(self.marker.position);
+		MyMap.map.panBy(0, -150);
 		self.infowindow.open(MyMap.map, self.marker);
 	});
 
@@ -204,28 +205,47 @@ var ViewModel = function() {
   self.places = ko.observableArray([]);
   self.currentPlace = ko.observable();
 	self.query = ko.observable('');
-	self.listViewVisible= ko.observable(false);
+	self.listViewVisible = ko.observable(false);
 
+  /**
+	 * Searches for input in the names of all places and adds them to the
+	 * ViewModels's list of places, shown in the listView, if there is match.
+	 */
 	self.search = function(value) {
 		self.places.removeAll();
 
 		for(var i = 0 ; i < Places.myPlaces.length; i++) {
       if(Places.myPlaces[i].name().toLowerCase().indexOf(value.toLowerCase()) >= 0) {
-        self.places.push(Places.myPlaces[i]);
-      }
+				Places.myPlaces[i].marker.setVisible(true);
+				self.places.push(Places.myPlaces[i]);
+      } else {
+				Places.myPlaces[i].marker.setVisible(false);
+			}
     }
+
+		// The listView will be set to visible as long as there is something input.
+		if(value.length > 0) {
+			self.listViewVisible(true);
+		}
 	};
 
 	self.query.subscribe(self.search);
 
 	self.selectCurrentPlace = function(place) {
-		console.log(place.name);
 		if(place.hasWikiResponse === false) {
 			place.getWikiArticle();
 		}
 
     MyMap.map.setCenter(place.marker.position);
+		MyMap.map.panBy(0, -150);
+
 		place.infowindow.open(MyMap.map, place.marker);
+
+		if(!window.matchMedia("(min-width: 1200px)").matches) {
+			self.toggleListViewVisibility();
+		} else {
+			MyMap.map.panBy(-300, 0);
+		}
 	};
 
 	self.toggleListViewVisibility = function() {

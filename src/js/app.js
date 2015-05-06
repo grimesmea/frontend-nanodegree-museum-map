@@ -133,7 +133,7 @@ var Place = function(data) {
 	this.name = ko.observable(data.name);
   this.latLng = ko.observable(data.geometry.location);
 	this.infowindowContent =  null;
-	this.infowindow = null;
+	this.infowindow = new google.maps.InfoWindow();
 	this.hasWikiResponse = false;
 
 	this.marker = new google.maps.Marker({
@@ -156,8 +156,13 @@ var Place = function(data) {
     var wikiUrl = 'http://en.wikipedia.org/w/api.php?action=opensearch&search=' + data.name + '&format=json&callback=wikiCallback';
     var infowindowStartTags = '<div class="infowindow">';
 		var infowindowEndTags = '<div>';
+
 		infowindowContent = '<h3>' + data.name + '</h3>';
 
+		/**
+		 * Sets infowindow content to be an error message in the event that the
+		 * Wikipedia Ajax request does not recieve a response within 1 sec.
+		 */
 		var wikiRequestTimeout = setTimeout(function() {
       self.infowindowContent = infowindowStartTags +
 			                         infowindowContent +
@@ -166,6 +171,10 @@ var Place = function(data) {
 			self.infowindow.setContent(self.infowindowContent);
     }, 1000);
 
+		/**
+		 * JSONP Ajax request to Wikipedia. Sets infowindow content according to the
+		 * response.
+		 */
 		$.ajax({
       url: wikiUrl,
       dataType: 'jsonp',
@@ -193,9 +202,7 @@ var Place = function(data) {
       }
     });
 
-    self.infowindow = new google.maps.InfoWindow({
-		                    content: self.infowindowContent
-	                    });
+    self.infowindow.setContent(self.infowindowContent);
 	};
 };
 

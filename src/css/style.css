@@ -45,7 +45,7 @@ html, body, #map-canvas {
   border: 2px solid #009a49;
 }
 
-#search-results {
+#list-view {
 	display: flex;
 	flex-direction: column;
 	max-width: 500px;
@@ -59,7 +59,7 @@ html, body, #map-canvas {
   overflow-y: auto;
 }
 
-.place-item {
+.list-item {
 	display: flex;
 	flex-shrink:0;
 	background-color: rgba(255,255,255,0.95);
@@ -70,11 +70,11 @@ html, body, #map-canvas {
 	font-size: 1em;
 }
 
-.place-item:hover {
+.list-item:hover {
   background-color: rgba(255,130,0,0.95);
 }
 
-#list-control {
+#list-view-control {
   display: flex;
   max-width: 500px;
 	height: 35px;

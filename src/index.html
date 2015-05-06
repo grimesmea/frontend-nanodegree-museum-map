@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Neighborhood Map</title>
+    <title>Dublin Museum Explorer</title>
     <link rel="stylesheet" href="css/style.css">
   </head>
   <body>
@@ -13,14 +13,14 @@
       <input data-bind="value: query, valueUpdate: 'keyup'" autocomplete="off" id="search-area" type="search" placeholder="Search...">
     </div>
 
-    <div data-bind="click: toggleListViewVisibility" id="list-control">
+    <div data-bind="click: toggleListViewVisibility" id="list-view-control">
       <img id="nav-arrow" src="images/nav-arrow.png">
     </div>
 
-    <div data-bind="template: {name:'places-template', foreach: places}, visible: listViewVisible" id="search-results"></div>
+    <div data-bind="template: {name:'places-template', foreach: places}, visible: listViewVisible" id="list-view"></div>
 
     <script type="text/html" id="places-template">
-      <div data-bind="click: $parent.selectCurrentPlace, text: name" class="place-item"></div>
+      <div data-bind="click: $parent.selectCurrentPlace, text: name" class="list-item"></div>
     </script>
 
     <link href='http://fonts.googleapis.com/css?family=Lato' rel='stylesheet' type='text/css'>

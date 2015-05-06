@@ -15,11 +15,13 @@ var MyMap = {
       this.createMap();
 			//this.findUserLocation();
 		} else {
-			$('#map-canvas').append('Oops...something went wrong. Try back later!');
+			$('#search-bar').css({'display': 'none'});
+			$('#list-view-control').css({'display': 'none'});
+			$('#map-canvas').append('<h2 class="error-message">We had trouble loading Google Maps. Please try refreshing the page or try again later.</h2>');
 		}
 	},
 
-  createMap: function() {
+	createMap: function() {
 		this.latLng = new google.maps.LatLng(53.348, -6.2597);
 		this.mapOptions = {
 			center: this.latLng,
@@ -155,7 +157,7 @@ var Place = function(data) {
 	this.getWikiArticle = function() {
     var wikiUrl = 'http://en.wikipedia.org/w/api.php?action=opensearch&search=' + data.name + '&format=json&callback=wikiCallback';
     var infowindowStartTags = '<div class="infowindow">';
-		var infowindowEndTags = '<div>';
+		var infowindowEndTags = '</div>';
 
 		infowindowContent = '<h3>' + data.name + '</h3>';
 
@@ -192,7 +194,7 @@ var Place = function(data) {
 					                         infowindowContent +
 					                         '<p>No wikipedia article found for this location. ' +
 																	 'Please consider requesting an article be created. </p>' +
-																	 '<a href="http://en.wikipedia.org/wiki/Wikipedia:Requested_articles" target="_blank">See the Wikipedia requested article documentation</a>' +
+																	 '<a href="http://en.wikipedia.org/wiki/Wikipedia:Requested_articles" target="_blank">Find out how to request an article</a>' +
 																	 infowindowEndTags;
 				}
 

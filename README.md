@@ -2,22 +2,26 @@
 
 A map of showing prominent museums in a Dublin, Ireland.
 
-This project uses the Google Maps API, Google Places API, MediaWiki API,
-Knockout.js framework, and jQuery.
+This project uses:
+Google Maps API  
+Google Places API  
+MediaWiki API  
+Knockout.js  
+jQuery
 
-The finished project can viewed at http://grimesmea.github.io/frontend-nanodegree-museum-map/.
+The finished project can viewed at http://grimesmea.github.io/frontend-nanodegree-museum-map/src.
 
 Source code available at https://github.com/grimesmea/frontend-nanodegree-museum-map/.
 
 ## How does it work?
 
-Just visit http://grimesmea.github.io/frontend-nanodegree-museum-map/. After the page has loaded, you can click on map markers to see information for Wikipedia, and search the places marked on the map.
+Just visit http://grimesmea.github.io/frontend-nanodegree-museum-map/src. After the page has loaded, you can click on map markers to see information from Wikipedia and search the places marked on the map.
 
 ## Resources and Acknowledgements
 
 http://knockoutjs.com/documentation/  
 http://api.jquery.com/  
-bower.io/docs/  
+http://bower.io/docs/  
 http://stackoverflow.com/questions/9228958/how-to-check-if-google-maps-api-is-loaded  
 http://stackoverflow.com/questions/2832636/google-maps-api-v3-getbounds-is-undefined  
 http://stackoverflow.com/questions/17140138/google-maps-api-not-returning-all-places-within-bounds  

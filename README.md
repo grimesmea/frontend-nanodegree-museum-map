@@ -2,7 +2,7 @@
 
 A map of showing prominent museums in a Dublin, Ireland.
 
-This project uses:
+This project uses:  
 Google Maps API  
 Google Places API  
 MediaWiki API  

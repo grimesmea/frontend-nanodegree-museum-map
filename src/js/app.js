@@ -1,6 +1,5 @@
 /**
- * Includes functionality to setup the Google Map, use geolocation, and stores
- * map options.
+ * Map object has functionality to setup the Google Map and stores map options.
  */
 var MyMap = {
 	latLng: null,
@@ -11,9 +10,13 @@ var MyMap = {
   init: function(observablePlacesArray) {
 		this.observablePlacesArray = observablePlacesArray;
 
-    if(typeof google === 'object' && typeof google.maps === 'object') {
+    /**
+		 * Checks if the google object is defined (meaning the Google Maps API has
+		 * been reached). If it has, the map is created. If not, an error message
+		 * is displayed on the page.
+		 */
+		if(typeof google === 'object' && typeof google.maps === 'object') {
       this.createMap();
-			//this.findUserLocation();
 		} else {
 			$('#search-bar').css({'display': 'none'});
 			$('#list-view-control').css({'display': 'none'});
@@ -21,6 +24,7 @@ var MyMap = {
 		}
 	},
 
+	// Creates a new google map.
 	createMap: function() {
 		this.latLng = new google.maps.LatLng(53.348, -6.2597);
 		this.mapOptions = {
@@ -32,10 +36,12 @@ var MyMap = {
 
     this.map = new google.maps.Map(document.getElementById("map-canvas"), this.mapOptions);
 
+		// Makes the call to the Google Places API everytime a new 'idle' event occurs.
 		google.maps.event.addListener(MyMap.map, 'idle', function() {
 			Places.getPlaces();
     });
 
+		// Recenters the map everytime the 'resize' event occurs.
 		google.maps.event.addDomListener(window, 'resize', function() {
 			var center = MyMap.map.getCenter();
 
@@ -43,50 +49,6 @@ var MyMap = {
       MyMap.map.setCenter(center);
     });
 	},
-
-  findUserLocation: function() {
-		/**
-		* Try HTML5 geolocation, if request to share location is not granted by the
-		* user, this code will not run and default latLng will be used.
-		*/
-		if(navigator.geolocation) {
-			navigator.geolocation.getCurrentPosition(function(position) {
-				var pos = new google.maps.LatLng(position.coords.latitude,
-																				position.coords.longitude);
-				var infowindow = new google.maps.InfoWindow({
-					map: map,
-					position: pos,
-					content: 'Location found!'
-				});
-
-        map.setCenter(pos);
-			}, function() {
-				handleNoGeolocation(true);
-			});
-		} else {
-			// Browser doesn't support Geolocation
-			handleNoGeolocation(false);
-		}
-
-		var handleNoGeolocation = function(errorFlag) {
-			var content = '';
-
-      if(errorFlag) {
-				content = 'Error: The Geolocation service failed :/';
-			} else {
-				content = 'Error: Your browser doesn\'t support geolocation :(';
-			}
-
-      var options = {
-				map: map,
-				position: latLng,
-				content: content
-			};
-
-      var infowindow = new google.maps.InfoWindow(options);
-			map.setCenter(options.position);
-		};
-	}
 };
 
 /**
@@ -97,6 +59,8 @@ var Places = {
   myPlaces: [],
   placeIds: new Set(),
 
+
+  // Searchs for all museums by prominence in the map bounds using Google Places.
   getPlaces: function() {
     var services;
     var mapBounds = MyMap.map.getBounds();
@@ -112,23 +76,31 @@ var Places = {
     service.nearbySearch(request, this.callback);
   },
 
+	/**
+	 * Checks the status of the Google Places request, and if OK, creates a new
+	 * place object for each result and pushes it to an observableArray.
+	 */
   callback: function(results, status) {
     if(status == google.maps.places.PlacesServiceStatus.OK) {
       for(var i = 0; i < results.length; i++) {
         var myPlace = results[i];
 
-        if(!Places.placeIds.has(myPlace.place_id)) {
+        // Checks if the result has already been added to the array of places.
+				if(!Places.placeIds.has(myPlace.place_id)) {
           Places.placeIds.add(myPlace.place_id);
           Places.myPlaces.push(new Place(myPlace));
 					MyMap.observablePlacesArray.push(Places.myPlaces[Places.myPlaces.length-1]);
-
-					console.log(myPlace.name);
         }
       }
     }
   }
 };
 
+/**
+ * Place object that stores the name, coordinates, infowindow and infowindow
+ * content, and map marker of each place. New places are created using data from
+ * a third party data API.
+ */
 var Place = function(data) {
 	var self = this;
 
@@ -144,10 +116,15 @@ var Place = function(data) {
 									title: data.name
 								});
 
+	// Opens the place's infowindow on click.
 	google.maps.event.addListener(self.marker, 'click', function() {
 		self.openInfowindow();
 	});
 
+	/**
+	 * Opens the infowindow. Gets the Wikipedia article for the place if one has
+	 * been successfully requested.
+	 */
 	this.openInfowindow = function() {
 		if(self.hasWikiResponse === false) {
 			self.getWikiArticle();
@@ -156,12 +133,14 @@ var Place = function(data) {
 		MyMap.map.setCenter(self.marker.position);
 		MyMap.map.panBy(0, -150);
 
+		// Makes the map marker bounce for a set time when the window is opened.
 		self.marker.setAnimation(google.maps.Animation.BOUNCE);
 		setTimeout(function(){self.marker.setAnimation(null); }, 1350);
 
 		self.infowindow.open(MyMap.map, self.marker);
 	};
 
+  // Requests the wikipedia entry for the current place according to its name.
 	this.getWikiArticle = function() {
     var wikiUrl = 'http://en.wikipedia.org/w/api.php?action=opensearch&search=' + data.name + '&format=json&callback=wikiCallback';
     var infowindowStartTags = '<div class="infowindow">';
@@ -246,11 +225,14 @@ var ViewModel = function() {
 		}
 	};
 
+	// Calls the search function when the search bar input ("query") changes.
 	self.query.subscribe(self.search);
 
+	// Opens the infowindow for the place selected in the listView.
 	self.selectCurrentPlace = function(place) {
 		place.openInfowindow();
 
+		// Closes the listView or pans the map depending on the winow width.
 		if(!window.matchMedia("(min-width: 1200px)").matches) {
 			self.toggleListViewVisibility();
 		} else {
@@ -258,13 +240,19 @@ var ViewModel = function() {
 		}
 	};
 
+	// Toggles listView visibility.
 	self.toggleListViewVisibility = function() {
 		self.listViewVisible(!self.listViewVisible());
 	};
 
-  MyMap.init(self.places);
+  /**
+	 * Initialises the map, passing the places observablesArray so new places can
+	 * can be added to the ViewModel places array.
+	 */
+	MyMap.init(self.places);
 };
 
+// Activate Knockout once the DOM has loaded.
 $(function() {
   ko.applyBindings(new ViewModel());
 });

@@ -5,6 +5,7 @@ var MyMap = {
 	latLng: null,
 	mapOptions: {},
 	myMap: null,
+	infowindow: null,
 	observablePlacesArray: null,
 
   init: function(observablePlacesArray) {
@@ -18,8 +19,8 @@ var MyMap = {
 		if(typeof google === 'object' && typeof google.maps === 'object') {
       this.createMap();
 		} else {
-			$('#search-bar').css({'display': 'none'});
-			$('#list-view-control').css({'display': 'none'});
+			$('#search-bar').addClass('hidden');
+			$('#list-view-control').addClass('hidden');
 			$('#map-canvas').append('<h2 class="error-message">We had trouble loading Google Maps. Please try refreshing the page or try again later.</h2>');
 		}
 	},
@@ -35,6 +36,7 @@ var MyMap = {
 		};
 
     this.map = new google.maps.Map(document.getElementById("map-canvas"), this.mapOptions);
+    this.infowindow = new google.maps.InfoWindow();
 
 		// Makes the call to the Google Places API everytime a new 'idle' event occurs.
 		google.maps.event.addListener(MyMap.map, 'idle', function() {
@@ -107,7 +109,6 @@ var Place = function(data) {
 	this.name = ko.observable(data.name);
   this.latLng = ko.observable(data.geometry.location);
 	this.infowindowContent =  null;
-	this.infowindow = new google.maps.InfoWindow();
 	this.hasWikiResponse = false;
 
 	this.marker = new google.maps.Marker({
@@ -137,7 +138,8 @@ var Place = function(data) {
 		self.marker.setAnimation(google.maps.Animation.BOUNCE);
 		setTimeout(function(){self.marker.setAnimation(null); }, 1350);
 
-		self.infowindow.open(MyMap.map, self.marker);
+		MyMap.infowindow.setContent(self.infowindowContent);
+		MyMap.infowindow.open(MyMap.map, self.marker);
 	};
 
   // Requests the wikipedia entry for the current place according to its name.
@@ -157,7 +159,7 @@ var Place = function(data) {
 			                         infowindowContent +
 			                         '<p>Failed to reach Wikipedia</p>' +
 															 infowindowEndTags;
-			self.infowindow.setContent(self.infowindowContent);
+			MyMap.infowindow.setContent(self.infowindowContent);
     }, 1000);
 
 		/**
@@ -185,13 +187,13 @@ var Place = function(data) {
 																	 infowindowEndTags;
 				}
 
-				self.infowindow.setContent(self.infowindowContent);
-				self.hasWikiResponse === true;
+				MyMap.infowindow.setContent(self.infowindowContent);
+				self.hasWikiResponse = true;
 				clearTimeout(wikiRequestTimeout);
       }
     });
 
-    self.infowindow.setContent(self.infowindowContent);
+    MyMap.infowindow.setContent(self.infowindowContent);
 	};
 };
 

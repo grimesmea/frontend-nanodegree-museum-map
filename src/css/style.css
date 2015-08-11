@@ -19,6 +19,10 @@ html, body, #map-canvas {
 	padding: 20px;
 }
 
+.hidden {
+	visibility: hidden;
+}
+
 #search-bar {
   box-shadow: 0 2px 6px #ccc;
   max-width: 500px;

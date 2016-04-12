@@ -1,6 +1,6 @@
 # Project 5 — Neighborhood Map
 
-A map of showing prominent museums in a Dublin, Ireland.
+A map showing prominent museums in Dublin, Ireland.
 
 This project uses:  
 Google Maps API  
